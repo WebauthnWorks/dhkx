@@ -79,7 +79,7 @@ func exchangeKey(p1, p2 *peer) error {
 }
 
 func TestKeyExchange(t *testing.T) {
-	group, _ := GetGroup(14)
+	group, _ := GetGroup(DHKX_ID14)
 	p1 := newPeer(group)
 	p2 := newPeer(group)
 
@@ -103,7 +103,7 @@ func TestCustomGroupKeyExchange(t *testing.T) {
 }
 
 func TestPIsNotMutable(t *testing.T) {
-	d, _ := GetGroup(0)
+	d, _ := GetGroup(DHKX_ID_DEFAULT)
 	p := d.p.String()
 	d.P().Set(big.NewInt(1))
 	if p != d.p.String() {
@@ -112,7 +112,7 @@ func TestPIsNotMutable(t *testing.T) {
 }
 
 func TestGIsNotMutable(t *testing.T) {
-	d, _ := GetGroup(0)
+	d, _ := GetGroup(DHKX_ID_DEFAULT)
 	g := d.g.String()
 	d.G().Set(big.NewInt(0))
 	if g != d.g.String() {
