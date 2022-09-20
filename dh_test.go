@@ -33,43 +33,43 @@ type dhTestCase struct {
 	zz *big.Int
 }
 
-func (self *dhTestCase) testOne(xa, ya, yb *big.Int, oppo bool) error {
+func (h *dhTestCase) testOne(xa, ya, yb *big.Int, oppo bool) error {
 	group := new(DHGroup)
-	group.p = self.p
-	group.g = self.g
+	group.p = h.p
+	group.g = h.g
 
 	priv := new(DHKey)
-	priv.x = xa
-	priv.y = new(big.Int).Exp(group.g, priv.x, group.p)
-	if ya.Cmp(priv.y) != 0 {
+	priv.X = xa
+	priv.Y = new(big.Int).Exp(group.g, priv.X, group.p)
+	if ya.Cmp(priv.Y) != 0 {
 		if oppo {
-			return fmt.Errorf("%v = yb != g ^ xb mod p = %v", ya, priv.y)
+			return fmt.Errorf("%v = yb != g ^ xb mod p = %v", ya, priv.Y)
 		}
-		return fmt.Errorf("%v = ya != g ^ xa mod p = %v", ya, priv.y)
+		return fmt.Errorf("%v = ya != g ^ xa mod p = %v", ya, priv.Y)
 	}
 
 	pub := new(DHKey)
-	pub.y = yb
+	pub.Y = yb
 
 	z, err := group.ComputeKey(pub, priv)
 	if err != nil {
 		return err
 	}
-	if self.zz.Cmp(z.y) != 0 {
+	if h.zz.Cmp(z.Y) != 0 {
 		if oppo {
-			return fmt.Errorf("%v = zz != ya ^ xb mod p = %v", self.zz, z.y)
+			return fmt.Errorf("%v = zz != ya ^ xb mod p = %v", h.zz, z.Y)
 		}
-		return fmt.Errorf("%v = zz != yb ^ xa mod p = %v", self.zz, z.y)
+		return fmt.Errorf("%v = zz != yb ^ xa mod p = %v", h.zz, z.Y)
 	}
 	return nil
 }
 
-func (self *dhTestCase) test() error {
-	err := self.testOne(self.xa, self.ya, self.yb, false)
+func (h *dhTestCase) test() error {
+	err := h.testOne(h.xa, h.ya, h.yb, false)
 	if err != nil {
 		return err
 	}
-	err = self.testOne(self.xb, self.yb, self.ya, true)
+	err = h.testOne(h.xb, h.yb, h.ya, true)
 	if err != nil {
 		return err
 	}

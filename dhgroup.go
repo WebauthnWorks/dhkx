@@ -29,19 +29,19 @@ type DHGroup struct {
 	g *big.Int
 }
 
-func (self *DHGroup) P() *big.Int {
+func (h *DHGroup) P() *big.Int {
 	p := new(big.Int)
-	p.Set(self.p)
+	p.Set(h.p)
 	return p
 }
 
-func (self *DHGroup) G() *big.Int {
+func (h *DHGroup) G() *big.Int {
 	g := new(big.Int)
-	g.Set(self.g)
+	g.Set(h.g)
 	return g
 }
 
-func (self *DHGroup) GeneratePrivateKey(randReader io.Reader) (key *DHKey, err error) {
+func (h *DHGroup) GeneratePrivateKey(randReader io.Reader) (key *DHKey, err error) {
 	if randReader == nil {
 		randReader = rand.Reader
 	}
@@ -53,24 +53,24 @@ func (self *DHGroup) GeneratePrivateKey(randReader io.Reader) (key *DHKey, err e
 	// However, since x is highly unlikely to be zero if p is big enough,
 	// we would rather use an iterative approach below,
 	// which is more efficient in terms of exptected running time.
-	x, err := rand.Int(randReader, self.p)
+	x, err := rand.Int(randReader, h.p)
 	if err != nil {
 		return
 	}
 
 	zero := big.NewInt(0)
 	for x.Cmp(zero) == 0 {
-		x, err = rand.Int(randReader, self.p)
+		x, err = rand.Int(randReader, h.p)
 		if err != nil {
 			return
 		}
 	}
 	key = new(DHKey)
-	key.x = x
+	key.X = x
 
 	// y = g ^ x mod p
-	key.y = new(big.Int).Exp(self.g, x, self.p)
-	key.group = self
+	key.Y = new(big.Int).Exp(h.g, x, h.p)
+	key.Group = h
 	return
 }
 
@@ -129,26 +129,26 @@ func CreateGroup(prime, generator *big.Int) (group *DHGroup) {
 	return
 }
 
-func (self *DHGroup) ComputeKey(pubkey *DHKey, privkey *DHKey) (key *DHKey, err error) {
-	if self.p == nil {
+func (h *DHGroup) ComputeKey(pubkey *DHKey, privkey *DHKey) (key *DHKey, err error) {
+	if h.p == nil {
 		err = errors.New("DH: invalid group")
 		return
 	}
-	if pubkey.y == nil {
+	if pubkey.Y == nil {
 		err = errors.New("DH: invalid public key")
 		return
 	}
-	if pubkey.y.Sign() <= 0 || pubkey.y.Cmp(self.p) >= 0 {
+	if pubkey.Y.Sign() <= 0 || pubkey.Y.Cmp(h.p) >= 0 {
 		err = errors.New("DH parameter out of bounds")
 		return
 	}
-	if privkey.x == nil {
+	if privkey.X == nil {
 		err = errors.New("DH: invalid private key")
 		return
 	}
-	k := new(big.Int).Exp(pubkey.y, privkey.x, self.p)
+	k := new(big.Int).Exp(pubkey.Y, privkey.X, h.p)
 	key = new(DHKey)
-	key.y = k
-	key.group = self
+	key.Y = k
+	key.Group = h
 	return
 }

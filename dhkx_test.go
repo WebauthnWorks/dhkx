@@ -36,18 +36,17 @@ func newPeer(g *DHGroup) *peer {
 	return ret
 }
 
-func (self *peer) getPubKey() []byte {
-	return self.priv.Bytes()
+func (h *peer) getPubKey() []byte {
 	return h.priv.MarshalPublicKey()
 }
 
-func (self *peer) recvPeerPubKey(pub []byte) {
+func (h *peer) recvPeerPubKey(pub []byte) {
 	pubKey := NewPublicKey(pub)
-	self.pub = pubKey
+	h.pub = pubKey
 }
 
-func (self *peer) getKey() []byte {
-	k, err := self.group.ComputeKey(self.pub, self.priv)
+func (h *peer) getKey() []byte {
+	k, err := h.group.ComputeKey(h.pub, h.priv)
 	if err != nil {
 		return nil
 	}
@@ -73,7 +72,7 @@ func exchangeKey(p1, p2 *peer) error {
 
 	for i, k := range key1 {
 		if key2[i] != k {
-			return fmt.Errorf("%vth byte does not same")
+			return fmt.Errorf("%vth byte does not same", i)
 		}
 	}
 	return nil
