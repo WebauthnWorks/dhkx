@@ -38,6 +38,7 @@ func newPeer(g *DHGroup) *peer {
 
 func (self *peer) getPubKey() []byte {
 	return self.priv.Bytes()
+	return h.priv.MarshalPublicKey()
 }
 
 func (self *peer) recvPeerPubKey(pub []byte) {
@@ -50,7 +51,7 @@ func (self *peer) getKey() []byte {
 	if err != nil {
 		return nil
 	}
-	return k.Bytes()
+	return k.MarshalPublicKey()
 }
 
 func exchangeKey(p1, p2 *peer) error {

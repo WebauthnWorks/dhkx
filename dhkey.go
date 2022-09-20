@@ -22,40 +22,40 @@ import (
 )
 
 type DHKey struct {
-	x *big.Int
-	y *big.Int
+	X *big.Int
+	Y *big.Int
 
-	group *DHGroup
+	Group *DHGroup
 }
 
-func (self *DHKey) Bytes() []byte {
-	if self.y == nil {
+func (h *DHKey) MarshalPublicKey() []byte {
+	if h.Y == nil {
 		return nil
 	}
-	if self.group != nil {
+	if h.Group != nil {
 		// len = ceil(bitLen(y) / 8)
-		blen := (self.group.p.BitLen() + 7) / 8
+		blen := (h.Group.p.BitLen() + 7) / 8
 		ret := make([]byte, blen)
-		copyWithLeftPad(ret, self.y.Bytes())
+		copyWithLeftPad(ret, h.Y.Bytes())
 		return ret
 	}
-	return self.y.Bytes()
+	return h.Y.Bytes()
 }
 
-func (self *DHKey) String() string {
-	if self.y == nil {
+func (h *DHKey) MarshalPublicKeyString() string {
+	if h.Y == nil {
 		return ""
 	}
-	return self.y.String()
+	return h.Y.String()
 }
 
-func (self *DHKey) IsPrivateKey() bool {
-	return self.x != nil
+func (h *DHKey) IsPrivateKey() bool {
+	return h.X != nil
 }
 
 func NewPublicKey(s []byte) *DHKey {
 	key := new(DHKey)
-	key.y = new(big.Int).SetBytes(s)
+	key.Y = new(big.Int).SetBytes(s)
 	return key
 }
 
